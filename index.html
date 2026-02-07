@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FactStream | Linkup Research Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #10b981;
+            --secondary: #f59e0b;
+            --accent: #8b5cf6;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-dark: #030712;
+            --bg-card: #0f1419;
+            --bg-elevated: #1a1f26;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #2d3748;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 0% 50%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 100% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 50%);
+        }
+
+        .header {
+            background: rgba(15, 20, 25, 0.8);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-sub {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.4rem 0.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge.live {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--primary);
+            color: var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .main {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1200px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .scores {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-card {
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .score-card.fscore::before { background: var(--primary); }
+        .score-card.correct::before { background: var(--success); }
+        .score-card.incorrect::before { background: var(--danger); }
+        .score-card.skipped::before { background: var(--text-muted); }
+        .score-card.latency::before { background: var(--accent); }
+
+        .score-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .score-card.fscore .score-value { color: var(--primary); }
+        .score-card.correct .score-value { color: var(--success); }
+        .score-card.incorrect .score-value { color: var(--danger); }
+        .score-card.skipped .score-value { color: var(--text-muted); }
+        .score-card.latency .score-value { color: var(--accent); }
+
+        .score-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 0.2rem;
+        }
+
+        .score-sub {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 0.2rem;
+        }
+
+        .question-panel {
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .question-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .question-counter {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .question-box {
+            background: var(--bg-dark);
+            border-radius: 10px;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .question-tags {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.5rem;
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--accent);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .question-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .answers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .answer-box {
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .answer-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .answer-text {
+            font-size: 0.85rem;
+        }
+
+        .answer-text.expected { color: var(--success); }
+
+        .result-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 0.75rem;
+            font-weight: 600;
+        }
+
+        .result-box.correct {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .result-box.incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .result-box.waiting {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .categories {
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .categories-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem;
+            background: var(--bg-dark);
+            border-radius: 8px;
+        }
+
+        .category-icon { font-size: 1.1rem; }
+
+        .category-info { flex: 1; }
+
+        .category-name {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .category-score {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .category-bar {
+            width: 45px;
+            height: 6px;
+            background: var(--bg-elevated);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .category-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            transition: width 0.4s;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .btn:hover {
+            border-color: var(--primary);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .leaderboard {
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .leaderboard-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .lb-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            margin-bottom: 0.4rem;
+        }
+
+        .lb-item.highlight {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--primary);
+        }
+
+        .lb-rank {
+            width: 22px;
+            height: 22px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .lb-rank.gold { background: linear-gradient(135deg, #ffd700, #ffb700); color: #1a1a1a; }
+        .lb-rank.silver { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #1a1a1a; }
+        .lb-rank.bronze { background: linear-gradient(135deg, #cd7f32, #a0522d); color: white; }
+        .lb-rank.other { background: var(--bg-elevated); color: var(--text-muted); }
+
+        .lb-name { flex: 1; font-size: 0.8rem; }
+        .lb-score { 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary);
+        }
+
+        .ring-container {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .ring {
+            position: relative;
+            width: 130px;
+            height: 130px;
+        }
+
+        .ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .ring-bg {
+            fill: none;
+            stroke: var(--bg-elevated);
+            stroke-width: 10;
+        }
+
+        .ring-fill {
+            fill: none;
+            stroke: url(#grad1);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 345;
+            stroke-dashoffset: 345;
+            transition: stroke-dashoffset 0.8s;
+        }
+
+        .ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .ring-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary);
+        }
+
+        .ring-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .history {
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            gap: 0.6rem;
+            padding: 0.5rem;
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            margin-bottom: 0.4rem;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .history-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .history-icon.correct { background: rgba(16, 185, 129, 0.2); }
+        .history-icon.incorrect { background: rgba(239, 68, 68, 0.2); }
+
+        .history-content { flex: 1; min-width: 0; }
+
+        .history-q {
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-meta {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .history-time {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.85rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">✓</div>
+                <div>
+                    <div class="logo-text">FactStream</div>
+                    <div class="logo-sub">Linkup Research Demo</div>
+                </div>
+            </div>
+            <div class="badges">
+                <span class="badge live">● Evaluating</span>
+                <span class="badge">SimpleQA</span>
+                <span class="badge">Dynamic Benchmark</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="hero">
+            <h1>📊 Real-Time Dynamic Factuality Evaluation</h1>
+            <p>Continuously evaluate search engine factuality with live-generated test cases — beyond static benchmarks</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🎯 Live Evaluation</span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted); font-family: 'JetBrains Mono';">SimpleQA Dynamic v2</span>
+                </div>
+                <div class="card-body">
+                    <div class="scores">
+                        <div class="score-card fscore">
+                            <div class="score-value" id="fscore">0.0%</div>
+                            <div class="score-label">F-Score</div>
+                            <div class="score-sub">Target: 91%</div>
+                        </div>
+                        <div class="score-card correct">
+                            <div class="score-value" id="correct">0</div>
+                            <div class="score-label">Correct</div>
+                            <div class="score-sub" id="correctPct">0%</div>
+                        </div>
+                        <div class="score-card incorrect">
+                            <div class="score-value" id="incorrect">0</div>
+                            <div class="score-label">Incorrect</div>
+                            <div class="score-sub" id="incorrectPct">0%</div>
+                        </div>
+                        <div class="score-card skipped">
+                            <div class="score-value" id="skipped">0</div>
+                            <div class="score-label">Skipped</div>
+                            <div class="score-sub" id="skippedPct">0%</div>
+                        </div>
+                        <div class="score-card latency">
+                            <div class="score-value" id="latency">0ms</div>
+                            <div class="score-label">Avg Latency</div>
+                            <div class="score-sub">p99: <span id="p99">0ms</span></div>
+                        </div>
+                    </div>
+
+                    <div class="question-panel">
+                        <div class="question-header">
+                            <span class="question-title">🔄 Current Question</span>
+                            <span class="question-counter" id="counter">0 / 4,326</span>
+                        </div>
+                        <div class="question-box">
+                            <div class="question-tags" id="tags">
+                                <span class="tag">Science</span>
+                            </div>
+                            <div class="question-text" id="questionText">
+                                Click "Start Evaluation" to begin...
+                            </div>
+                            <div class="answers">
+                                <div class="answer-box">
+                                    <div class="answer-label">Expected Answer</div>
+                                    <div class="answer-text expected" id="expected">—</div>
+                                </div>
+                                <div class="answer-box">
+                                    <div class="answer-label">Linkup Response</div>
+                                    <div class="answer-text" id="response">—</div>
+                                </div>
+                            </div>
+                            <div class="result-box waiting" id="result">
+                                ⏳ Waiting for evaluation...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="categories">
+                        <div class="categories-title">📂 Category Breakdown</div>
+                        <div class="category-grid">
+                            <div class="category-item">
+                                <span class="category-icon">🔬</span>
+                                <div class="category-info">
+                                    <div class="category-name">Science</div>
+                                    <div class="category-score" id="sciScore">0/0</div>
+                                </div>
+                                <div class="category-bar"><div class="category-fill" id="sciFill" style="width:0%"></div></div>
+                            </div>
+                            <div class="category-item">
+                                <span class="category-icon">🏛️</span>
+                                <div class="category-info">
+                                    <div class="category-name">Politics</div>
+                                    <div class="category-score" id="polScore">0/0</div>
+                                </div>
+                                <div class="category-bar"><div class="category-fill" id="polFill" style="width:0%"></div></div>
+                            </div>
+                            <div class="category-item">
+                                <span class="category-icon">💻</span>
+                                <div class="category-info">
+                                    <div class="category-name">Technology</div>
+                                    <div class="category-score" id="techScore">0/0</div>
+                                </div>
+                                <div class="category-bar"><div class="category-fill" id="techFill" style="width:0%"></div></div>
+                            </div>
+                            <div class="category-item">
+                                <span class="category-icon">🎨</span>
+                                <div class="category-info">
+                                    <div class="category-name">Arts</div>
+                                    <div class="category-score" id="artsScore">0/0</div>
+                                </div>
+                                <div class="category-bar"><div class="category-fill" id="artsFill" style="width:0%"></div></div>
+                            </div>
+                            <div class="category-item">
+                                <span class="category-icon">⚽</span>
+                                <div class="category-info">
+                                    <div class="category-name">Sports</div>
+                                    <div class="category-score" id="sportScore">0/0</div>
+                                </div>
+                                <div class="category-bar"><div class="category-fill" id="sportFill" style="width:0%"></div></div>
+                            </div>
+                            <div class="category-item">
+                                <span class="category-icon">🌍</span>
+                                <div class="category-info">
+                                    <div class="category-name">Geography</div>
+                                    <div class="category-score" id="geoScore">0/0</div>
+                                </div>
+                                <div class="category-bar"><div class="category-fill" id="geoFill" style="width:0%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="btn primary" id="evalBtn" onclick="toggleEval()">
+                            <span id="evalIcon">▶️</span>
+                            <span id="evalText">Start Evaluation</span>
+                        </button>
+                        <button class="btn" onclick="stepQuestion()">⏭️ Next</button>
+                        <button class="btn" onclick="resetAll()">🔄 Reset</button>
+                        <button class="btn" onclick="exportReport()">📊 Export</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">🏆 Leaderboard</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="leaderboard">
+                            <div class="lb-item highlight">
+                                <div class="lb-rank gold">1</div>
+                                <div class="lb-name">Linkup Deep</div>
+                                <div class="lb-score" id="linkupLb">91.0%</div>
+                            </div>
+                            <div class="lb-item">
+                                <div class="lb-rank silver">2</div>
+                                <div class="lb-name">Tavily</div>
+                                <div class="lb-score">93.3%</div>
+                            </div>
+                            <div class="lb-item">
+                                <div class="lb-rank bronze">3</div>
+                                <div class="lb-name">Perplexity</div>
+                                <div class="lb-score">85.2%</div>
+                            </div>
+                            <div class="lb-item">
+                                <div class="lb-rank other">4</div>
+                                <div class="lb-name">Exa</div>
+                                <div class="lb-score">78.4%</div>
+                            </div>
+                            <div class="lb-item">
+                                <div class="lb-rank other">5</div>
+                                <div class="lb-name">GPT-4 (no search)</div>
+                                <div class="lb-score">38.2%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">📈 F-Score Progress</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="ring-container">
+                            <div class="ring">
+                                <svg width="130" height="130">
+                                    <defs>
+                                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#10b981"/>
+                                            <stop offset="100%" stop-color="#f59e0b"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <circle class="ring-bg" cx="65" cy="65" r="55"/>
+                                    <circle class="ring-fill" id="ringFill" cx="65" cy="65" r="55"/>
+                                </svg>
+                                <div class="ring-text">
+                                    <div class="ring-value" id="ringValue">0%</div>
+                                    <div class="ring-label">F-Score</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">📋 Recent Results</span>
+                        <span style="font-size: 0.65rem; color: var(--text-muted);" id="historyCount">0 evaluated</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="history" id="history">
+                            <div style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 1.5rem;">
+                                Start evaluation to see results
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast" id="toast">
+        <span>✅</span>
+        <div>
+            <div style="font-weight: 600; font-size: 0.85rem;" id="toastTitle">Success!</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);" id="toastMsg">Action completed</div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        var isEvaluating = false;
+        var evalInterval = null;
+        var qNum = 0;
+        var correctCount = 0;
+        var incorrectCount = 0;
+        var skippedCount = 0;
+        var totalLatency = 0;
+        var latencies = [];
+        var historyItems = [];
+
+        var cats = {
+            sci: { c: 0, t: 0 },
+            pol: { c: 0, t: 0 },
+            tech: { c: 0, t: 0 },
+            arts: { c: 0, t: 0 },
+            sport: { c: 0, t: 0 },
+            geo: { c: 0, t: 0 }
+        };
+
+        var questions = [
+            { q: "What is the chemical symbol for gold?", a: "Au", cat: "sci", tags: ["Science", "Chemistry"] },
+            { q: "Who was the 44th President of the United States?", a: "Barack Obama", cat: "pol", tags: ["Politics", "US History"] },
+            { q: "What year was the first iPhone released?", a: "2007", cat: "tech", tags: ["Technology", "Apple"] },
+            { q: "Who painted the Mona Lisa?", a: "Leonardo da Vinci", cat: "arts", tags: ["Arts", "Renaissance"] },
+            { q: "Which country won the 2022 FIFA World Cup?", a: "Argentina", cat: "sport", tags: ["Sports", "Football"] },
+            { q: "What is the capital of Australia?", a: "Canberra", cat: "geo", tags: ["Geography", "Capitals"] },
+            { q: "What is the speed of light in m/s?", a: "299,792,458 m/s", cat: "sci", tags: ["Science", "Physics"] },
+            { q: "Who founded Tesla, Inc.?", a: "Martin Eberhard and Marc Tarpenning", cat: "tech", tags: ["Technology", "Business"] },
+            { q: "What is the largest planet in our solar system?", a: "Jupiter", cat: "sci", tags: ["Science", "Astronomy"] },
+            { q: "Who wrote '1984'?", a: "George Orwell", cat: "arts", tags: ["Arts", "Literature"] },
+            { q: "What year did World War II end?", a: "1945", cat: "pol", tags: ["Politics", "History"] },
+            { q: "What is the currency of Japan?", a: "Japanese Yen (JPY)", cat: "geo", tags: ["Geography", "Economics"] }
+        ];
+
+        function updateRing(val) {
+            var circumference = 345;
+            var offset = circumference - (val / 100 * circumference);
+            document.getElementById('ringFill').style.strokeDashoffset = offset;
+            document.getElementById('ringValue').textContent = val.toFixed(1) + '%';
+        }
+
+        function toggleEval() {
+            if (!isEvaluating) {
+                startEval();
+            } else {
+                pauseEval();
+            }
+        }
+
+        function startEval() {
+            isEvaluating = true;
+            document.getElementById('evalIcon').textContent = '⏸️';
+            document.getElementById('evalText').textContent = 'Pause';
+            evalInterval = setInterval(stepQuestion, 1800);
+            showToast('Evaluation Started', 'Processing SimpleQA benchmark');
+        }
+
+        function pauseEval() {
+            isEvaluating = false;
+            document.getElementById('evalIcon').textContent = '▶️';
+            document.getElementById('evalText').textContent = 'Resume';
+            if (evalInterval) {
+                clearInterval(evalInterval);
+                evalInterval = null;
+            }
+            showToast('Evaluation Paused', qNum + ' questions evaluated');
+        }
+
+        function stepQuestion() {
+            qNum++;
+            var q = questions[Math.floor(Math.random() * questions.length)];
+
+            document.getElementById('counter').textContent = qNum + ' / 4,326';
+            document.getElementById('tags').innerHTML = q.tags.map(function(t) {
+                return '<span class="tag">' + t + '</span>';
+            }).join('');
+            document.getElementById('questionText').textContent = q.q;
+            document.getElementById('expected').textContent = q.a;
+
+            var resultBox = document.getElementById('result');
+            resultBox.className = 'result-box waiting';
+            resultBox.innerHTML = '⏳ Processing...';
+            document.getElementById('response').textContent = '...';
+
+            var lat = 100 + Math.random() * 400;
+            latencies.push(lat);
+            totalLatency += lat;
+
+            setTimeout(function() {
+                var rand = Math.random();
+                var res;
+                if (rand < 0.88) {
+                    res = 'correct';
+                    correctCount++;
+                    cats[q.cat].c++;
+                } else if (rand < 0.95) {
+                    res = 'incorrect';
+                    incorrectCount++;
+                } else {
+                    res = 'skipped';
+                    skippedCount++;
+                }
+                cats[q.cat].t++;
+
+                var resp = res === 'correct' ? q.a : 
+                    res === 'incorrect' ? 'Different answer' : 'Unable to determine';
+                document.getElementById('response').textContent = resp;
+
+                if (res === 'correct') {
+                    resultBox.className = 'result-box correct';
+                    resultBox.innerHTML = '✓ Correct';
+                } else if (res === 'incorrect') {
+                    resultBox.className = 'result-box incorrect';
+                    resultBox.innerHTML = '✗ Incorrect';
+                } else {
+                    resultBox.className = 'result-box waiting';
+                    resultBox.innerHTML = '— Not Attempted';
+                }
+
+                updateScores();
+                updateCategories();
+                addHistory(q, res, lat);
+            }, lat);
+        }
+
+        function updateScores() {
+            var total = correctCount + incorrectCount + skippedCount;
+            var precision = correctCount / (correctCount + incorrectCount || 1);
+            var recall = correctCount / (total || 1);
+            var f = 2 * (precision * recall) / (precision + recall || 1) * 100;
+
+            document.getElementById('fscore').textContent = f.toFixed(1) + '%';
+            document.getElementById('correct').textContent = correctCount;
+            document.getElementById('incorrect').textContent = incorrectCount;
+            document.getElementById('skipped').textContent = skippedCount;
+
+            document.getElementById('correctPct').textContent = (correctCount / total * 100 || 0).toFixed(1) + '%';
+            document.getElementById('incorrectPct').textContent = (incorrectCount / total * 100 || 0).toFixed(1) + '%';
+            document.getElementById('skippedPct').textContent = (skippedCount / total * 100 || 0).toFixed(1) + '%';
+
+            var avgLat = totalLatency / total || 0;
+            document.getElementById('latency').textContent = avgLat.toFixed(0) + 'ms';
+
+            var sorted = latencies.slice().sort(function(a, b) { return a - b; });
+            var p99 = sorted[Math.floor(sorted.length * 0.99)] || 0;
+            document.getElementById('p99').textContent = p99.toFixed(0) + 'ms';
+
+            updateRing(f);
+            document.getElementById('linkupLb').textContent = f.toFixed(1) + '%';
+        }
+
+        function updateCategories() {
+            var catMap = {
+                sci: { score: 'sciScore', fill: 'sciFill' },
+                pol: { score: 'polScore', fill: 'polFill' },
+                tech: { score: 'techScore', fill: 'techFill' },
+                arts: { score: 'artsScore', fill: 'artsFill' },
+                sport: { score: 'sportScore', fill: 'sportFill' },
+                geo: { score: 'geoScore', fill: 'geoFill' }
+            };
+
+            for (var cat in cats) {
+                var data = cats[cat];
+                var rate = data.t > 0 ? (data.c / data.t * 100) : 0;
+                document.getElementById(catMap[cat].score).textContent = data.c + '/' + data.t;
+                document.getElementById(catMap[cat].fill).style.width = rate + '%';
+            }
+        }
+
+        function addHistory(q, res, lat) {
+            var container = document.getElementById('history');
+
+            var item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = '<div class="history-icon ' + (res === 'correct' ? 'correct' : 'incorrect') + '">' +
+                (res === 'correct' ? '✓' : res === 'incorrect' ? '✗' : '—') + '</div>' +
+                '<div class="history-content">' +
+                '<div class="history-q">' + q.q + '</div>' +
+                '<div class="history-meta">' + q.tags[0] + ' • ' + lat.toFixed(0) + 'ms</div>' +
+                '</div>' +
+                '<div class="history-time">Q' + qNum + '</div>';
+
+            if (container.firstChild && container.firstChild.style) {
+                container.innerHTML = '';
+            }
+
+            container.insertBefore(item, container.firstChild);
+            historyItems.unshift(item);
+
+            if (historyItems.length > 15) {
+                var old = historyItems.pop();
+                if (old.parentNode) old.parentNode.removeChild(old);
+            }
+
+            document.getElementById('historyCount').textContent = historyItems.length + ' evaluated';
+        }
+
+        function resetAll() {
+            pauseEval();
+            qNum = 0;
+            correctCount = 0;
+            incorrectCount = 0;
+            skippedCount = 0;
+            totalLatency = 0;
+            latencies = [];
+            historyItems = [];
+
+            for (var cat in cats) {
+                cats[cat] = { c: 0, t: 0 };
+            }
+
+            document.getElementById('fscore').textContent = '0.0%';
+            document.getElementById('correct').textContent = '0';
+            document.getElementById('incorrect').textContent = '0';
+            document.getElementById('skipped').textContent = '0';
+            document.getElementById('latency').textContent = '0ms';
+            document.getElementById('p99').textContent = '0ms';
+            document.getElementById('counter').textContent = '0 / 4,326';
+            document.getElementById('questionText').textContent = 'Click "Start Evaluation" to begin...';
+            document.getElementById('expected').textContent = '—';
+            document.getElementById('response').textContent = '—';
+            document.getElementById('history').innerHTML = '<div style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 1.5rem;">Start evaluation to see results</div>';
+            document.getElementById('historyCount').textContent = '0 evaluated';
+
+            var resultBox = document.getElementById('result');
+            resultBox.className = 'result-box waiting';
+            resultBox.innerHTML = '⏳ Waiting for evaluation...';
+
+            updateRing(0);
+            updateCategories();
+            showToast('Reset Complete', 'Evaluation data cleared');
+        }
+
+        function exportReport() {
+            showToast('📊 Report Exported', 'factstream_report_' + qNum + 'q.json');
+        }
+
+        function showToast(title, msg) {
+            var toast = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.add('show');
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
